@@ -1,0 +1,18 @@
+{
+    "meta": {
+        "results": 1
+    },
+    "data": [
+        {
+            "brand": "Rolex",
+            "reference_number": "116900",
+            "model": "Rolex Air King",
+            "movement": "Automatic",
+            "year_of_production": "2009 - 2023",
+            "case_material": "Steel",
+            "case_diameter": "40 mm",
+            "description": null,
+            "last_updated": "2023-11-10 00:00:54"
+        }
+    ]
+}

@@ -1,20 +1,21 @@
 import flet as ft
 import json
-from .apiconnect import get_Image 
 def start():
     ft.run(createapp)   
 def get_data():
-    with open("dane.json","r",encoding="utf-8") as f:
+    with open("model.json","r",encoding="utf-8") as f:
         return json.load(f)
 
 data = get_data()
+status_text = ft.Text("uzyj terkstu")
+
 def createapp(page: ft.Page):
     page.title = "WatchFinder"
     page.add(ft.Text("Projekt Py"))
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.add(search_bar())
     page.add(create_card())
+    
 
 def search_bar():
     return ft.SafeArea(
@@ -43,10 +44,11 @@ def create_card():
                 bgcolor=ft.Colors.WHITE_30,
                 content=ft.Column(
                     controls=[
-                        ft.Text(value=data["watches"][0]["makeName"],size=20),
-                        ft.Text(value=data["watches"][0]["modelName"],size=10),
-                        ft.Text(value=data["watches"][0]["yearProducedName"],size=10),
-                        # ft.Image(src_base64=get_Image(data["watches"][0]["watchImageName"]),width=20,height=20),
+                        ft.Text(value=data["data"][0]["brand"],size=20),
+                        ft.Text(value=data["data"][0]["model"],size=15),
+                        ft.Text(value=data["data"][0]["year_of_production"],size=10),
+                        
+                        # ft.Image(src=data["data"]["model"],width=100,height=100),
                                                 
                     ]
                 
@@ -54,4 +56,5 @@ def create_card():
             )
         )
     )
+
 
