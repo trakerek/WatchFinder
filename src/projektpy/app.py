@@ -1,5 +1,6 @@
 import flet as ft
 import json
+from .apiconnect import get_watch_image
 def start():
     ft.run(createapp)   
 def get_data():
@@ -13,6 +14,8 @@ def createapp(page: ft.Page):
     page.title = "WatchFinder"
     page.add(ft.Text("Projekt Py"))
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+    page.window.width = 600
+    page.window.height = 700
     page.add(search_bar())
     page.add(create_card())
     
@@ -31,29 +34,52 @@ def search_bar():
             ]),
         ),
     )
-    
+    # def drag_accept(e):
+    #     e.src.content.content.value = "0"
+    #     e.control.content.content.value = "1"
+    #     page.update()    
+
 def create_card():
     return ft.SafeArea(
-        content=ft.Card(
-            content=ft.Container(
-                padding=20,
-                width=300,
-                height=400,
-                border_radius=10,
-                border=ft.border.Border.all(color=ft.Colors.BLUE),
-                bgcolor=ft.Colors.WHITE_30,
-                content=ft.Column(
-                    controls=[
-                        ft.Text(value=data["data"][0]["brand"],size=20),
-                        ft.Text(value=data["data"][0]["model"],size=15),
-                        ft.Text(value=data["data"][0]["year_of_production"],size=10),
+        content=ft.Row(
+            alignment=ft.MainAxisAlignment.CENTER,
+            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            controls=[
+                ft.IconButton(
+                    width=50,
+                    height=50,
+                    icon=ft.icons.Icons.REMOVE_CIRCLE,           
+                ),
+                ft.Card(
+                    content=ft.Container(
+                        padding=20,
+                        width=300,
+                        height=400,
+                        border_radius=10,
+                        border=ft.border.Border.all(color=ft.Colors.BLUE),
+                        bgcolor=ft.Colors.WHITE_30,
+                        alignment=ft.alignment.Alignment.CENTER,
+                        content=ft.Column(
+                            alignment=ft.alignment.Alignment.CENTER,
+                            controls=[
+                                ft.Text(value=data["data"][0]["brand"],size=20),
+                                ft.Text(value=data["data"][0]["model"],size=15),
+                                ft.Text(value=data["data"][0]["year_of_production"],size=10),
+                                ft.Image(src=get_watch_image(data["data"][0]["model"]),width=150,height=200),
+                                                                
+                            ]
+                                
+                        )
+                    )
+                ),
+                ft.IconButton(
+                    width=50,
+                    height=50,
+                    icon=ft.icons.Icons.FAVORITE,
                         
-                        # ft.Image(src=data["data"]["model"],width=100,height=100),
-                                                
-                    ]
-                
                 )
-            )
+            ]
+            
         )
     )
 

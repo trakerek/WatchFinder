@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from ddgs import DDGS
 
 load_dotenv()
 api_key = os.getenv("apikey2")
@@ -81,22 +82,12 @@ class WatchImageResponse(BaseModel):
 @app.post("/get-ref-via-ai")
 def get_watch_image(user_query: str):
     try:
-        chat = client.chats.create(
-            model="gemini-3.6-flash",
-            config=types.GenerateContentConfig(
-                tools=[{"google_search": {}}],
-                system_instruction=(
-                    "Jesteś ekspertem zegarmistrzostwa. Wyciągnij model i numer referencyjny. "
-                    "Wyszukaj w sieci bezpośredni, publicznie dostępny adres URL do zdjęcia "
-                    "tego zegarka. Zwróć dane wyłącznie w formacie JSON zgodnym ze schematem."
-                ),
-                response_mime_type="application/json",
-                response_schema=WatchImageResponse,
-            )
-        )
-        response = chat.send_message(f"Zwróc link do zdjecia zegara: {user_query}")
-        print(response.parsed)
-        return response.parsed
-
+        with DDGS() as ddg:
+            results = list(ddg.images(query=user_query,max_results=1, region="pl", safe="off", site="all", time="any", lang="pl"))
+            if len(results) > 0:
+                image_url = results[0].get("image")
+                print(image_url)
+                return image_url
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Błąd wyszukiwania zdjęcia: {e}")
+    return "https://via.placeholder.com/400x400?text=Brak+Zdjecia"
