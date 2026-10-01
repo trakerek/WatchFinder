@@ -3,6 +3,7 @@ from .app import start
 
 def main():
 	start()
+	# get_details()
 
 if __name__ == "__main__":
 	main()

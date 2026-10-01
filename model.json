@@ -5,14 +5,15 @@
     "data": [
         {
             "brand": "Rolex",
-            "reference_number": "116900",
+            "reference_number": "126900",
             "model": "Rolex Air King",
             "movement": "Automatic",
-            "year_of_production": "2009 - 2023",
+            "year_of_production": "2020 - 2024",
             "case_material": "Steel",
             "case_diameter": "40 mm",
             "description": null,
-            "last_updated": "2023-11-10 00:00:54"
+            "last_updated": "2024-01-26 00:01:19"
         }
-    ]
+    ],
+    "price": "35 800 PLN"
 }

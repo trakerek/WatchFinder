@@ -15,6 +15,12 @@ WATCH_API_URL = "https://api.thewatchapi.com/v1/brand/list"
 MODEL_API_URL = "https://api.thewatchapi.com/v1/model/list"
 DETAILS_API_URL = "https://api.thewatchapi.com/v1/model/search"
 
+
+class WatchRefResponse(BaseModel):
+    reference_number: str
+    cena: str
+
+
 app =FastAPI()
 @app.get("/brands")
 def get_brands():
@@ -40,24 +46,27 @@ def get_model():
 
 @app.get("/details")
 def get_details():
+    aidata = get_watch_reference("Rolex Air King")
+    ref_num = aidata.reference_number
+    price = aidata.cena
     params = {
         "brand": "Rolex",
         "model" : "Rolex Air King",
-        "reference_number": get_watch_reference("Rolex Air King"),
+        "reference_number": ref_num,
         "api_token": api_key
     }
     response = requests.get(DETAILS_API_URL,params=params)
-    with open("model.json","w",encoding="utf-8") as f:
-        json.dump(response.json(),f,indent=4,ensure_ascii=False)
+    data = response.json()
+
+    if isinstance(data, dict):
+        data["price"] = price
+
+    with open("model.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
 
 
 # AI API CONNECTION
 client = genai.Client(api_key=os.getenv("gptapi"))
-class WatchRefResponse(BaseModel):
-    # brand: str
-    # model: str
-    reference_number: str
-    # confidence: str  # np. "high", "medium"
 
 @app.post("/get-ref-via-ai")
 def get_watch_reference(user_query: str):
@@ -66,12 +75,12 @@ def get_watch_reference(user_query: str):
             model="gemini-3.6-flash",
             config=types.GenerateContentConfig(
                 system_instruction=f"Jesteś ekspertem zegarmistrzostwa. Analizujesz zapytanie użytkownika i wyciągasz z niego markę, model oraz najbardziej " \
-                f"prawdopodobny główny numer referencyjny.",
+                f"prawdopodobny główny numer referencyjny oraz cene.",
                 response_mime_type="application/json",
                 response_schema=WatchRefResponse,
             ),
         )
-        response = chat.send_message(f"Wskaz numer referencyjny zegara: {user_query}")
+        response = chat.send_message(f"Wskaz numer referencyjny i cene zegara: {user_query}")
         print(response.parsed)
         return response.parsed
 
