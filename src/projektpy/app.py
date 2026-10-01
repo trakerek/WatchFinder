@@ -6,11 +6,17 @@ def start():
 def get_data():
     with open("model.json","r",encoding="utf-8") as f:
         return json.load(f)
+    return ""
 
-data = get_data()
-status_text = ft.Text("uzyj terkstu")
+try:
+    data = get_data()
+except Exception as e:
+    data = ""
+    print(e)
+
 
 def createapp(page: ft.Page):
+    
     page.title = "WatchFinder"
     page.add(ft.Text("Projekt Py"))
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
