@@ -64,8 +64,7 @@ def get_details(modelname,ref_num=None):
         ref_num = aidata.reference_number
         price = aidata.cena
     params = {
-        # "brand": "Rolex",
-        "model" : modelname,
+        # "model" : modelname,
         "reference_number": ref_num,
         "api_token": api_key
     }

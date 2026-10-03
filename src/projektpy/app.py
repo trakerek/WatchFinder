@@ -1,6 +1,8 @@
 import flet as ft
 import json
 from .apiconnect import get_watch_image
+from .backend import *
+
 def start():
     ft.run(createapp)   
 def get_data():
@@ -27,6 +29,7 @@ def createapp(page: ft.Page):
     page.add(create_card())
     
 def wybrany_brand(value):
+    get_marka(value)
     print(value)
 def get_brands():
     lista = []
@@ -39,7 +42,7 @@ def create_dropdown():
     dropdown = ft.Dropdown(
         label="Wybierz marke",
         value="All",
-        on_select=wybrany_brand,
+        on_select=lambda e: wybrany_brand(e.control.value),
         options=[
             ft.DropdownOption(key="All",text="All"),
             *[ft.DropdownOption(brand) for brand in get_brands()]
@@ -61,8 +64,12 @@ def create_dropdown():
 #             ]),
 #         ),
 #     )
-
 def create_card():
+    brand = ft.Text(size=20)
+    model = ft.Text(size=15)
+    year = ft.Text(size=10)
+    price = ft.Text(size=13)
+    image = ft.Image(src="",width=150, height=200)
     card_container = ft.Container(
         padding=20,
         width=300,
@@ -76,45 +83,70 @@ def create_card():
         animate_offset=ft.Animation(100, ft.AnimationCurve.EASE_OUT),
         content=ft.Column(
             alignment=ft.alignment.Alignment.CENTER,
-            controls=[
-                ft.Text(value=data["data"][0]["brand"], size=20),
-                ft.Text(value=data["data"][0]["model"], size=15),
-                ft.Text(value=data["data"][0]["year_of_production"], size=10),
-                ft.Text(value=data["price"], size=10),
-                ft.Image(src=get_watch_image(data["data"][0]["model"]), width=150, height=200),
-            ]
+            controls=[brand, model, year, price, image]
         )
     )
+    def fill():
+        w = getwatch()
+        if w is None:
+            brand.value = "Koniec zegarków"
+            model.value = year.value = price.value = ""
+            image.visible = False
+        else:
+            brand.value = w.brand
+            model.value = w.model
+            year.value = w.year_of_production
+            price.value = w.price
+            image.src = w.image
+            image.visible = True
+
+    fill()
+
+    def decide(liked: bool):
+        if getwatch() is None:
+            return
+        like() if liked else dislike()
+        card_container.offset = ft.Offset(0, 0)
+        card_container.rotate = ft.Rotate(0)
+        fill()
+        card_container.update()
+
+    total_dx = 0
 
     def on_pan_update(e: ft.DragUpdateEvent):
-        card_container.offset = ft.Offset(e.local_delta.x / 15, 0)
-        card_container.rotate = ft.Rotate(e.local_delta.x / 10)
+        nonlocal total_dx
+        total_dx += e.local_delta.x
+        card_container.offset = ft.Offset(total_dx / 300, 0)
+        card_container.rotate = ft.Rotate(total_dx / 2000)
         card_container.update()
 
     def on_pan_end(e: ft.DragEndEvent):
-        if card_container.offset.x > 0.05:
-            print("Like!")
-        elif card_container.offset.x < -0.05:
-            print("Dislike!")
-            
-        # Powrót na środek
-        card_container.offset = ft.Offset(0, 0)
-        card_container.rotate=ft.Rotate(0)
-        card_container.update()
+        nonlocal total_dx
+        dx, total_dx = total_dx, 0
+        if dx > 100:
+            decide(True)
+        elif dx < -100:
+            decide(False)
+        else:
+            card_container.offset = ft.Offset(0, 0)
+            card_container.rotate = ft.Rotate(0)
+            card_container.update()
 
     return ft.SafeArea(
         content=ft.Row(
             alignment=ft.MainAxisAlignment.CENTER,
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
-                ft.IconButton(width=50, height=50, icon=ft.icons.Icons.REMOVE_CIRCLE),
+                ft.IconButton(icon=ft.icons.Icons.REMOVE_CIRCLE,
+                              on_click=lambda e: decide(False)),
                 ft.GestureDetector(
                     content=card_container,
                     on_pan_update=on_pan_update,
                     on_pan_end=on_pan_end,
                 ),
-                ft.IconButton(width=50, height=50, icon=ft.icons.Icons.FAVORITE),
-            ]
+                ft.IconButton(icon=ft.icons.Icons.FAVORITE,
+                              on_click=lambda e: decide(True)),
+            ],
         )
     )
 
