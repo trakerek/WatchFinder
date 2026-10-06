@@ -14,14 +14,18 @@ api_key = os.getenv("apikey2")
 WATCH_API_URL = "https://api.thewatchapi.com/v1/brand/list"
 MODEL_API_URL = "https://api.thewatchapi.com/v1/model/list"
 DETAILS_API_URL = "https://api.thewatchapi.com/v1/model/search"
+REF_NUM_URL = "https://api.thewatchapi.com/v1/reference/list"
 
 adresy_ref = []
 
 class WatchRefResponse(BaseModel):
+    marka: str
+    model: str
     reference_number: str
     cena: str
 
-
+class WatchImageResponse(BaseModel):
+    image_url: str
 app =FastAPI()
 @app.get("/brands")
 def get_brands():
@@ -61,10 +65,15 @@ def model_in_cache(model_name):
 def get_details(modelname,ref_num=None):
     if ref_num == None:
         aidata = get_watch_reference(modelname)
+        # ref_num = find_refs_web(modelname.split(" ")[0],modelname.split(" ")[1])
         ref_num = aidata.reference_number
+        brand = aidata.marka 
+        model = aidata.model
         price = aidata.cena
+        price = "11"
     params = {
-        # "model" : modelname,
+        "brand": brand,
+        # "model" : model,
         "reference_number": ref_num,
         "api_token": api_key
     }
@@ -111,15 +120,27 @@ def get_details(modelname,ref_num=None):
 # AI API CONNECTION
 client = genai.Client(api_key=os.getenv("gptapi"))
 
+
+@app.post("/get-ref-via-ai")
+def get_ref_list(brand):
+    params = {
+        "brand": brand,
+        "api_token": api_key
+    }
+    response = requests.get(REF_NUM_URL,params=params)
+    with open("ref_nums.json","w",encoding="utf-8") as f:
+        json.dump(response.json(),f,indent=4,ensure_ascii=False)
+
+
 @app.post("/get-ref-via-ai")
 def get_watch_reference(user_query: str, ref_num=None):
     try:
         if ref_num:
             tekst = f"Jesteś ekspertem zegarmistrzostwa. Analizujesz zapytanie użytkownika i wyciągasz z niego markę, model oraz najbardziej " \
-                f"prawdopodobny główny numer referencyjny oraz cene najlepiej odpowiadajacy w thewatchapi. Podaj inny numer referencyjny niż {adresy_ref}"
+                f"prawdopodobna marke, model i  główny numer referencyjny oraz cene najlepiej odpowiadajacy w thewatchapi. Podaj inny numer referencyjny niż {adresy_ref}"
         else:
             tekst = f"Jesteś ekspertem zegarmistrzostwa. Analizujesz zapytanie użytkownika i wyciągasz z niego markę, model oraz najbardziej " \
-                f"prawdopodobny główny numer referencyjny oraz cene najlepiej odpowiadajacy w thewatchapi."
+                f"prawdopodobna marke, model i główny numer referencyjny oraz cene najlepiej odpowiadajacy w thewatchapi."
         chat = client.chats.create(
             model="gemini-3.5-flash-lite",
             config=types.GenerateContentConfig(
@@ -135,8 +156,7 @@ def get_watch_reference(user_query: str, ref_num=None):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-class WatchImageResponse(BaseModel):
-    image_url: str
+
 @app.post("/get-watch-image")
 def get_watch_image(user_query: str):
     try:

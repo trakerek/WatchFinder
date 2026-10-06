@@ -3,7 +3,7 @@ from .app import start
 
 def main():
 	# start()
-	get_details("Casio GRAVITYMASTER")
+	model_in_cache("Rolex Air King")
 
 if __name__ == "__main__":
 	main()
