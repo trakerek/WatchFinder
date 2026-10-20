@@ -21,6 +21,264 @@
         "case_diameter": "40 mm",
         "description": null,
         "last_updated": "2024-01-26 00:01:19",
-        "price": "11"
+        "price": "7425 EUR"
+    },
+    {
+        "brand": "Casio",
+        "model": "G-SHOCK",
+        "year_of_production": "1983",
+        "price": "500 PLN"
+    },
+    {
+        "brand": "Patek Philippe",
+        "model": "Nautilus",
+        "year_of_production": "1976",
+        "price": "120000 EUR"
+    },
+    {
+        "brand": "Audemars Piguet",
+        "model": "Royal Oak",
+        "year_of_production": "1972",
+        "price": "25000 USD"
+    },
+    {
+        "brand": "Vacheron Constantin",
+        "model": "Overseas",
+        "year_of_production": "2020",
+        "price": "20000 USD"
+    },
+    {
+        "brand": "A. Lange & Söhne",
+        "model": "Lange 1",
+        "year_of_production": "1994",
+        "price": "35000 USD"
+    },
+    {
+        "brand": "Breguet",
+        "model": "Classique",
+        "year_of_production": "2020",
+        "price": "75000 PLN"
+    },
+    {
+        "brand": "Jaeger-LeCoultre",
+        "model": "Reverso",
+        "year_of_production": "1931",
+        "price": "8000 EUR"
+    },
+    {
+        "brand": "Blancpain",
+        "model": "Fifty Fathoms",
+        "year_of_production": "2023",
+        "price": "15000 USD"
+    },
+    {
+        "brand": "Richard Mille",
+        "model": "RM 011",
+        "year_of_production": "2007",
+        "price": "850000 PLN"
+    },
+    {
+        "brand": "F.P. Journe",
+        "model": "Chronomètre Bleu",
+        "year_of_production": "2015",
+        "price": "180000"
+    },
+    {
+        "brand": "Girard-Perregaux",
+        "model": "Laureato",
+        "year_of_production": "2023",
+        "price": "55000 PLN"
+    },
+    {
+        "brand": "Rolex",
+        "model": "Submariner",
+        "year_of_production": "2020",
+        "price": "45000"
+    },
+    {
+        "brand": "Omega",
+        "model": "Speedmaster Professional Moonwatch",
+        "year_of_production": "2021",
+        "price": "32000"
+    },
+    {
+        "brand": "Cartier",
+        "model": "Tank",
+        "year_of_production": "2020",
+        "price": "15000 PLN"
+    },
+    {
+        "brand": "Breitling",
+        "model": "Navitimer",
+        "year_of_production": "2023",
+        "price": "38000 PLN"
+    },
+    {
+        "brand": "Panerai",
+        "model": "Luminor Marina",
+        "year_of_production": "2020",
+        "price": "35000 PLN"
+    },
+    {
+        "brand": "IWC Schaffhausen",
+        "model": "Big Pilot's Watch",
+        "year_of_production": "2021",
+        "price": "60000 PLN"
+    },
+    {
+        "brand": "Hublot",
+        "model": "Big Bang",
+        "year_of_production": "2020",
+        "price": "45000 PLN"
+    },
+    {
+        "brand": "Zenith",
+        "model": "Chronomaster Sport",
+        "year_of_production": "2021",
+        "price": "45000 PLN"
+    },
+    {
+        "brand": "Grand Seiko",
+        "model": "Snowflake",
+        "year_of_production": "2010",
+        "price": "26000 PLN"
+    },
+    {
+        "brand": "Tudor",
+        "model": "Black Bay",
+        "year_of_production": "2023",
+        "price": "16500"
+    },
+    {
+        "brand": "Longines",
+        "model": "HydroConquest",
+        "year_of_production": "2023",
+        "price": "6500"
+    },
+    {
+        "brand": "TAG Heuer",
+        "model": "Monaco",
+        "year_of_production": "2023",
+        "price": "30000 PLN"
+    },
+    {
+        "brand": "Tissot",
+        "model": "PRX",
+        "year_of_production": "2021",
+        "price": "1750"
+    },
+    {
+        "brand": "Certina",
+        "model": "DS Action Diver",
+        "year_of_production": "2021",
+        "price": "3500 PLN"
+    },
+    {
+        "brand": "Frederique Constant",
+        "model": "Classic Worldtimer",
+        "year_of_production": "2021",
+        "price": "16500 PLN"
+    },
+    {
+        "brand": "Oris",
+        "model": "Aquis Date",
+        "year_of_production": "2023",
+        "price": "9500"
+    },
+    {
+        "brand": "Maurice Lacroix",
+        "model": "Aikon",
+        "year_of_production": "2023",
+        "price": "8500 PLN"
+    },
+    {
+        "brand": "Rado",
+        "model": "Captain Cook",
+        "year_of_production": "2023",
+        "price": "10000 PLN"
+    },
+    {
+        "brand": "Nomos Glashütte",
+        "model": "Tangente",
+        "year_of_production": "2023",
+        "price": "8500 PLN"
+    },
+    {
+        "brand": "Hamilton",
+        "model": "Khaki Field Mechanical",
+        "year_of_production": "2023",
+        "price": "2350 PLN"
+    },
+    {
+        "brand": "Seiko",
+        "model": "SKX007",
+        "year_of_production": "1996",
+        "price": "1500 PLN"
+    },
+    {
+        "brand": "Citizen",
+        "model": "Promaster Aqualand",
+        "year_of_production": "2020",
+        "price": "2000"
+    },
+    {
+        "brand": "Orient",
+        "model": "Bambino",
+        "year_of_production": "2017",
+        "price": "800 PLN"
+    },
+    {
+        "brand": "Casio",
+        "model": "G-SHOCK DW-5600",
+        "year_of_production": "1996",
+        "price": "450 PLN"
+    },
+    {
+        "brand": "Timex",
+        "model": "Expedition",
+        "year_of_production": "2020",
+        "price": "350 PLN"
+    },
+    {
+        "brand": "Bulova",
+        "model": "Lunar Pilot",
+        "year_of_production": "2016",
+        "price": "2500"
+    },
+    {
+        "brand": "Luminox",
+        "model": "Navy SEAL",
+        "year_of_production": "2020",
+        "price": "1800 PLN"
+    },
+    {
+        "brand": "Festina",
+        "model": "Chrono Bike",
+        "year_of_production": "2022",
+        "price": "1200 PLN"
+    },
+    {
+        "brand": "Vostok Europe",
+        "model": "Anchar",
+        "year_of_production": "2020",
+        "price": "2500 PLN"
+    },
+    {
+        "brand": "Zeppelin",
+        "model": "LZ129 Hindenburg",
+        "year_of_production": "2015",
+        "price": "1500 PLN"
+    },
+    {
+        "brand": "Garmin",
+        "model": "Fenix 8",
+        "year_of_production": "2024",
+        "price": "4999 PLN"
+    },
+    {
+        "brand": "Suunto",
+        "model": "Vertical",
+        "year_of_production": "2023",
+        "price": "2600"
     }
 ]

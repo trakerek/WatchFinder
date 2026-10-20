@@ -97,7 +97,7 @@ def create_card():
             model.value = w.model
             year.value = w.year_of_production
             price.value = w.price
-            image.src = w.image
+            image.src = get_watch_image(w.model)
             image.visible = True
 
     fill()

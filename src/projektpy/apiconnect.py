@@ -23,7 +23,11 @@ class WatchRefResponse(BaseModel):
     model: str
     reference_number: str
     cena: str
-
+class WatchModelByAi(BaseModel):
+    brand: str
+    model: str
+    year_of_production: str
+    price: str
 class WatchImageResponse(BaseModel):
     image_url: str
 app =FastAPI()
@@ -49,6 +53,25 @@ def get_model():
         json.dump(response.json(),f,indent=4,ensure_ascii=False)
 
 
+
+
+def find_watch_by_ai(modelname):
+    try:
+            chat = client.chats.create(
+                model="gemini-3.5-flash-lite",
+                config=types.GenerateContentConfig(
+                    
+                    system_instruction="Jesteś ekspertem zegarmistrzostwa. Analizujesz zapytanie użytkownika i wyciągasz z niego markę, model oraz najbardziej prawdopodoby rok produkcji i cene w PLN",
+                    response_mime_type="application/json",
+                    response_schema=WatchModelByAi,
+                ),
+            )
+            response = chat.send_message(f"Wskaz markę, model, rok_produkcji i cene zegara: {modelname}")
+            print(response.parsed)
+            return response.parsed
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 def model_in_cache(model_name):
     try:
         with open("cache.json","r",encoding="utf-8") as f:
@@ -62,15 +85,11 @@ def model_in_cache(model_name):
         print(e)
 
 @app.get("/details")
-def get_details(modelname,ref_num=None):
-    if ref_num == None:
-        aidata = get_watch_reference(modelname)
-        # ref_num = find_refs_web(modelname.split(" ")[0],modelname.split(" ")[1])
-        ref_num = aidata.reference_number
-        brand = aidata.marka 
-        model = aidata.model
-        price = aidata.cena
-        price = "11"
+def get_details(modelname):
+    aidata = get_watch_reference(modelname)
+    ref_num = aidata.reference_number
+    brand = aidata.marka
+    price = aidata.cena
     params = {
         "brand": brand,
         # "model" : model,
@@ -82,45 +101,45 @@ def get_details(modelname,ref_num=None):
         data = response.json()["data"][0]
     except Exception as e:
         print(e)
-        if len(adresy_ref) < 2:
-            adresy_ref.append(ref_num)
-            # print(adresy_ref)
-            zmienna = get_watch_reference(modelname,ref_num)
-            return get_details(modelname,zmienna.reference_number)
-            
+        reponse = dict(find_watch_by_ai(modelname))
+        print(reponse)
+        zapisywanie_cachu(reponse,modelname)
+        return
+
 
     if isinstance(data, dict):
         data["price"] = price
 
     #pobieranie modelu
-    try:
-        with open("model.json", "r", encoding="utf-8") as f:
-            data2 = json.load(f)
-            data2.append(data)
-    except Exception as e:
-        print(e)
-        data2 = [data]
-    #zapisywanie modelu
-    with open("model.json", "w", encoding="utf-8") as f:
-        json.dump(data2, f, indent=4, ensure_ascii=False)
-    
-    #zapisywanie modelu do cache
-    try:
-        with open("cache.json", "r", encoding="utf-8") as f:
-            cache = json.load(f)
-            cache.append(modelname)
-    except Exception as e:
-        print(e)
-        cache = [modelname]
-
-    
-    with open("cache.json", "w", encoding="utf-8") as f:
-        json.dump(cache, f, indent=4, ensure_ascii=False)
-
+    zapisywanie_cachu(data,modelname)
 # AI API CONNECTION
 client = genai.Client(api_key=os.getenv("gptapi"))
 
-
+def zapisywanie_cachu(data,modelname):
+    try:
+            with open("model.json", "r", encoding="utf-8") as f:
+                data2 = json.load(f)
+                data2.append(data)
+    except Exception as e:
+                print(e)
+                data2 = [data]
+        #zapisywanie modelu
+    with open("model.json", "w", encoding="utf-8") as f:
+            json.dump(data2, f, indent=4, ensure_ascii=False)
+        
+        #zapisywanie modelu do cache
+    try:
+            with open("cache.json", "r", encoding="utf-8") as f:
+                cache = json.load(f)
+                cache.append(modelname)
+    except Exception as e:
+            print(e)
+            cache = [modelname]
+    
+        
+    with open("cache.json", "w", encoding="utf-8") as f:
+            json.dump(cache, f, indent=4, ensure_ascii=False)
+    
 @app.post("/get-ref-via-ai")
 def get_ref_list(brand):
     params = {
@@ -133,13 +152,10 @@ def get_ref_list(brand):
 
 
 @app.post("/get-ref-via-ai")
-def get_watch_reference(user_query: str, ref_num=None):
+def get_watch_reference(user_query: str):
     try:
-        if ref_num:
-            tekst = f"Jesteś ekspertem zegarmistrzostwa. Analizujesz zapytanie użytkownika i wyciągasz z niego markę, model oraz najbardziej " \
-                f"prawdopodobna marke, model i  główny numer referencyjny oraz cene najlepiej odpowiadajacy w thewatchapi. Podaj inny numer referencyjny niż {adresy_ref}"
-        else:
-            tekst = f"Jesteś ekspertem zegarmistrzostwa. Analizujesz zapytanie użytkownika i wyciągasz z niego markę, model oraz najbardziej " \
+       
+        tekst = f"Jesteś ekspertem zegarmistrzostwa. Analizujesz zapytanie użytkownika i wyciągasz z niego markę, model oraz najbardziej " \
                 f"prawdopodobna marke, model i główny numer referencyjny oraz cene najlepiej odpowiadajacy w thewatchapi."
         chat = client.chats.create(
             model="gemini-3.5-flash-lite",
@@ -157,6 +173,7 @@ def get_watch_reference(user_query: str, ref_num=None):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+     
 @app.post("/get-watch-image")
 def get_watch_image(user_query: str):
     try:
