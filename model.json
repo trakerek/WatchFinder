@@ -280,5 +280,113 @@
         "model": "Vertical",
         "year_of_production": "2023",
         "price": "2600"
+    },
+    {
+        "brand": "Seiko",
+        "model": "SNK809",
+        "year_of_production": "2018",
+        "price": "550 PLN"
+    },
+    {
+        "brand": "Citizen",
+        "model": "BM8180-03E",
+        "year_of_production": "2019",
+        "price": "600 PLN"
+    },
+    {
+        "brand": "Orient",
+        "model": "Mako II",
+        "year_of_production": "2020",
+        "price": "700 PLN"
+    },
+    {
+        "brand": "Lorus",
+        "model": "RH941AX9",
+        "year_of_production": "2021",
+        "price": "320 PLN"
+    },
+    {
+        "brand": "Swatch",
+        "model": "Sistem51",
+        "year_of_production": "2017",
+        "price": "650 PLN"
+    },
+    {
+        "brand": "Seiko",
+        "model": "SUR307P1",
+        "year_of_production": "2021",
+        "price": "690 PLN"
+    },
+    {
+        "brand": "Lorus",
+        "model": "RG849CX9",
+        "year_of_production": "2022",
+        "price": "350 PLN"
+    },
+    {
+        "brand": "Seiko",
+        "model": "TURTLE",
+        "year_of_production": "2020",
+        "price": "600 PLN"
+    },
+    {
+        "brand": "Lorus",
+        "model": "RS993CX9",
+        "year_of_production": "2023",
+        "price": "410 PLN"
+    },
+    {
+        "brand": "Seiko",
+        "model": "SNE039P1",
+        "year_of_production": "2019",
+        "price": "520 PLN"
+    },
+    {
+        "brand": "Seiko",
+        "model": "SUR309P1",
+        "year_of_production": "2021",
+        "price": "680 PLN"
+    },
+    {
+        "brand": "Seiko",
+        "model": "SNE525P1",
+        "year_of_production": "2020",
+        "price": "700 PLN"
+    },
+    {
+        "brand": "Lorus",
+        "model": "RT321HX9",
+        "year_of_production": "2022",
+        "price": "450 PLN"
+    },
+    {
+        "brand": "Seiko",
+        "model": "SUR455P1",
+        "year_of_production": "2022",
+        "price": "710 PLN"
+    },
+    {
+        "brand": "Lorus",
+        "model": "RH951RX9",
+        "year_of_production": "2023",
+        "price": "390 PLN"
+    },
+    {
+        "brand": "Seiko",
+        "model": "SNXS79K1",
+        "year_of_production": "2020",
+        "price": "550 PLN"
+    },
+    {
+        "brand": "Lorus",
+        "model": "RM311CX9",
+        "year_of_production": "2022",
+        "price": "480 PLN"
+    },
+    {
+        "brand": "Casio",
+        "model": "Edifice EFV-100D-1AVUEF",
+        "year_of_production": "2021",
+        "price": "490 PLN"
     }
 ]

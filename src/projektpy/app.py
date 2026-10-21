@@ -1,7 +1,9 @@
 import flet as ft
 import json
+import asyncio
 from .apiconnect import get_watch_image
 from .backend import *
+
 
 def start():
     ft.run(createapp)   
@@ -27,6 +29,7 @@ def createapp(page: ft.Page):
     # page.add(search_bar())
     page.add(create_dropdown())
     page.add(create_card())
+    create_slider(page)
     
 def wybrany_brand(value):
     get_marka(value)
@@ -64,6 +67,36 @@ def create_dropdown():
 #             ]),
 #         ),
 #     )
+def create_slider(page: ft.Page): 
+    def handle_slider_change(e):
+        get_max_cena(e.control.value)
+        val = e.control.value if hasattr(e, "control") else e
+        message.value = f"Cena: {round(val)} PLN"
+        message.update()
+
+    my_slider = ft.Slider(
+        width=200,
+        min=0,
+        max=10000,
+        value=500,
+        label="{value}",
+        on_change=handle_slider_change,
+    )
+
+    message = ft.Text(f"Cena: {my_slider.value} PLN")
+
+    page.add(
+        ft.SafeArea(
+            content=ft.Column(
+                controls=[
+                    ft.Text("Wybierz cenę:"),
+                    my_slider,
+                    message,
+                ]
+            )
+        )
+    )
+
 def create_card():
     brand = ft.Text(size=20)
     model = ft.Text(size=15)
@@ -97,7 +130,7 @@ def create_card():
             model.value = w.model
             year.value = w.year_of_production
             price.value = w.price
-            image.src = get_watch_image(w.model)
+            image.src = get_watch_image("zegarek" + w.model)
             image.visible = True
 
     fill()

@@ -172,16 +172,68 @@ def get_watch_reference(user_query: str):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
+@app.post("/get-suitable-watch")
+def get_suitable_watch(user_query: str):
+    try:
+        tekst = f"Jestes Ekspertem zegarmistrza i analizujesz polubione i nielubiane zegaraki na podstwaie podanej marki i cen i dobierasz najbardziej odpowiadający"\
+                f"zegarek dla klienta"
+        chat = client.chats.create(
+            model="gemini-3.5-flash-lite",
+            config=types.GenerateContentConfig(
+                system_instruction=tekst,
+                response_mime_type="application/json",
+                response_schema=WatchModelByAi,
+            ),
+        )
+        response = chat.send_message(f"Wybierz zegar dla klienta {user_query}")
+        print(response.parsed)
+        return response.parsed
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
      
+def get_suitable_watches(user_query: str, n: int = 5):
+    try:
+        tekst = "Jestes ekspertem zegarmistrza i analizujesz polubione i nielubiane zegarki na podstawie podanej marki i cen. " \
+                "Dobierasz zegarki najbardziej odpowiadajace klientowi."
+        chat = client.chats.create(
+            model="gemini-3.5-flash-lite",
+            config=types.GenerateContentConfig(
+                system_instruction=tekst,
+                response_mime_type="application/json",
+                response_schema=list[WatchModelByAi],
+            ),
+        )
+        response = chat.send_message(f"Wybierz {n} roznych zegarow dla klienta {user_query}")
+        print(response.parsed)
+        return response.parsed
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+IMG_CACHE_FILE = "image_cache.json"
+try:
+    with open(IMG_CACHE_FILE, "r", encoding="utf-8") as f:
+        image_cache = json.load(f)
+except Exception:
+    image_cache = {}
+
 @app.post("/get-watch-image")
 def get_watch_image(user_query: str):
+    klucz = user_query.strip().lower()
+    if klucz in image_cache:
+        return image_cache[klucz]
     try:
         with DDGS() as ddg:
             results = list(ddg.images(query=user_query,max_results=1, region="pl", safe="off", site="all", time="any", lang="pl"))
             if len(results) > 0:
                 image_url = results[0].get("image")
                 print(image_url)
+                image_cache[klucz] = image_url
+                try:
+                    with open(IMG_CACHE_FILE, "w", encoding="utf-8") as f:
+                        json.dump(image_cache, f, indent=4, ensure_ascii=False)
+                except Exception as e:
+                    print(e)
                 return image_url
     except Exception as e:
         print(f"Błąd wyszukiwania zdjęcia: {e}")
