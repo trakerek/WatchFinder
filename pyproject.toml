@@ -14,14 +14,21 @@ dependencies = [
     "duckduckgo-search>=8.1.1",
     "fastapi>=0.141.1",
     "flet>=0.86.5",
+    "flutter>=0.1",
     "google>=3.0.0",
     "google-genai>=2.24.0",
-    "pydantic>=2.13.5",
+    "pydantic>=2.10.0,<3.0.0",
     "requests>=2.34.2",
 ]
 
 [project.scripts]
 projektpy = "projektpy:main"
+
+[tool.flet.app]
+path = "src"
+
+[tool.flet.flutter.pubspec.dependency_overrides]
+jni = "^1.1.0"
 
 [build-system]
 requires = ["uv_build>=0.12.13,<0.13.0"]

@@ -4,11 +4,14 @@ import asyncio
 from .apiconnect import get_watch_image
 from .backend import *
 
-
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BRAND_LIST_PATH = os.path.join(BASE_DIR, "brand_list.json")
+MODEL_LIST_PATH = os.path.join(BASE_DIR, "model_list.json")
+ICON_PATH = os.path.join(BASE_DIR, "zegarekimg.png")
 def start():
-    ft.run(createapp)   
+    ft.run(createapp,assets_dir=BASE_DIR)   
 def get_data():
-    with open("model.json","r",encoding="utf-8") as f:
+    with open(MODEL_LIST_PATH,"r",encoding="utf-8") as f:
         return json.load(f)
     return ""
 
@@ -20,15 +23,15 @@ except Exception as e:
 
 
 def createapp(page: ft.Page):
-    
+    get_max_cena(500)
     page.title = "WatchFinder"
-    page.add(ft.Text("Projekt Py"))
+    page.window.icon = "zegarekimg.ico"
+    page.scroll = ft.ScrollMode.AUTO 
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.window.width = 600
-    page.window.height = 700
+    page.add(ft.Text("Projekt Py"))
     # page.add(search_bar())
     page.add(create_dropdown())
-    page.add(create_card())
+    page.add(create_card(page))
     create_slider(page)
     
 def wybrany_brand(value):
@@ -36,7 +39,7 @@ def wybrany_brand(value):
     print(value)
 def get_brands():
     lista = []
-    with open("brand_list.json","r",encoding="utf-8") as f:
+    with open(BRAND_LIST_PATH,"r",encoding="utf-8") as f:
         data = json.load(f)
         for i in data["data"]:
             lista.append(i)
@@ -45,6 +48,7 @@ def create_dropdown():
     dropdown = ft.Dropdown(
         label="Wybierz marke",
         value="All",
+        width=280,
         on_select=lambda e: wybrany_brand(e.control.value),
         options=[
             ft.DropdownOption(key="All",text="All"),
@@ -75,7 +79,6 @@ def create_slider(page: ft.Page):
         message.update()
 
     my_slider = ft.Slider(
-        width=200,
         min=0,
         max=10000,
         value=500,
@@ -87,26 +90,34 @@ def create_slider(page: ft.Page):
 
     page.add(
         ft.SafeArea(
-            content=ft.Column(
-                controls=[
-                    ft.Text("Wybierz cenę:"),
-                    my_slider,
-                    message,
-                ]
+            content=ft.Container(
+                width=min(300, (page.width or 360) - 40),
+                content=ft.Column(
+                    controls=[
+                        ft.Text("Wybierz cenę:"),
+                        my_slider,
+                        message,
+                    ],
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                ),
             )
         )
     )
 
-def create_card():
+def create_card(page: ft.Page):
+    pw = page.width or 360
+    card_w = max(200, min(300, pw - 140)) 
+    card_h = card_w * 4 / 3
+
     brand = ft.Text(size=20)
     model = ft.Text(size=15)
     year = ft.Text(size=10)
     price = ft.Text(size=13)
-    image = ft.Image(src="",width=150, height=200)
+    image = ft.Image(src="", width=card_w * 0.5, height=card_h * 0.5, fit=ft.BoxFit.CONTAIN)
     card_container = ft.Container(
         padding=20,
-        width=300,
-        height=400,
+        width=card_w,
+        height=card_h,
         border_radius=10,
         border=ft.border.Border.all(color=ft.Colors.BLUE),
         bgcolor=ft.Colors.WHITE_30,
@@ -115,7 +126,8 @@ def create_card():
         rotate=ft.Rotate(0),
         animate_offset=ft.Animation(100, ft.AnimationCurve.EASE_OUT),
         content=ft.Column(
-            alignment=ft.alignment.Alignment.CENTER,
+            alignment=ft.MainAxisAlignment.CENTER,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[brand, model, year, price, image]
         )
     )
@@ -149,16 +161,16 @@ def create_card():
     def on_pan_update(e: ft.DragUpdateEvent):
         nonlocal total_dx
         total_dx += e.local_delta.x
-        card_container.offset = ft.Offset(total_dx / 300, 0)
+        card_container.offset = ft.Offset(total_dx / card_w, 0)
         card_container.rotate = ft.Rotate(total_dx / 2000)
         card_container.update()
 
     def on_pan_end(e: ft.DragEndEvent):
         nonlocal total_dx
         dx, total_dx = total_dx, 0
-        if dx > 100:
+        if dx > card_w / 3:
             decide(True)
-        elif dx < -100:
+        elif dx < -card_w / 3:
             decide(False)
         else:
             card_container.offset = ft.Offset(0, 0)
@@ -182,5 +194,3 @@ def create_card():
             ],
         )
     )
-
-

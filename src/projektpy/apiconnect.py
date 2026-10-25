@@ -8,8 +8,15 @@ from google import genai
 from google.genai import types
 from ddgs import DDGS
 
-load_dotenv()
+base_path = os.path.dirname(os.path.abspath(__file__))
+for name in ("secrets.env", ".env"):
+    p = os.path.join(base_path, name)
+    if os.path.exists(p):
+        load_dotenv(p)
+        break
 api_key = os.getenv("apikey2")
+gemini_key = os.getenv("gptapi")
+client = genai.Client(api_key=gemini_key) if gemini_key else None
 
 WATCH_API_URL = "https://api.thewatchapi.com/v1/brand/list"
 MODEL_API_URL = "https://api.thewatchapi.com/v1/model/list"
@@ -17,6 +24,12 @@ DETAILS_API_URL = "https://api.thewatchapi.com/v1/model/search"
 REF_NUM_URL = "https://api.thewatchapi.com/v1/reference/list"
 
 adresy_ref = []
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MODEL_PATH = os.path.join(BASE_DIR, "model.json")
+IMAGE_CACHE_FILE = os.path.join(BASE_DIR, "image_cache.json")
+CACHE_PATH = os.path.join(BASE_DIR, "cache.json")
+MODEL_LIST_PATH = os.path.join(BASE_DIR, "model_list.json")
+BRAND_LIST_PATH = os.path.join(BASE_DIR, "brand_list.json")
 
 class WatchRefResponse(BaseModel):
     marka: str
@@ -38,7 +51,7 @@ def get_brands():
         "api_token": api_key
     }
     response = requests.get(WATCH_API_URL,params=params)
-    with open("brand_list.json","w",encoding="utf-8") as f:
+    with open(BRAND_LIST_PATH,"w",encoding="utf-8") as f:
         json.dump(response.json(),f,indent=4,ensure_ascii=False)
 
 
@@ -49,7 +62,7 @@ def get_model():
         "api_token": api_key
     }
     response = requests.get(MODEL_API_URL,params=params)
-    with open("model_list.json","w",encoding="utf-8") as f:
+    with open(MODEL_LIST_PATH,"w",encoding="utf-8") as f:
         json.dump(response.json(),f,indent=4,ensure_ascii=False)
 
 
@@ -74,7 +87,7 @@ def find_watch_by_ai(modelname):
         raise HTTPException(status_code=500, detail=str(e))
 def model_in_cache(model_name):
     try:
-        with open("cache.json","r",encoding="utf-8") as f:
+        with open(CACHE_PATH,"r",encoding="utf-8") as f:
             data = json.load(f)
             for i in data:
                 if i == model_name:
@@ -113,23 +126,22 @@ def get_details(modelname):
     #pobieranie modelu
     zapisywanie_cachu(data,modelname)
 # AI API CONNECTION
-client = genai.Client(api_key=os.getenv("gptapi"))
 
 def zapisywanie_cachu(data,modelname):
     try:
-            with open("model.json", "r", encoding="utf-8") as f:
+            with open(MODEL_PATH, "r", encoding="utf-8") as f:
                 data2 = json.load(f)
                 data2.append(data)
     except Exception as e:
                 print(e)
                 data2 = [data]
         #zapisywanie modelu
-    with open("model.json", "w", encoding="utf-8") as f:
+    with open(MODEL_PATH, "w", encoding="utf-8") as f:
             json.dump(data2, f, indent=4, ensure_ascii=False)
         
         #zapisywanie modelu do cache
     try:
-            with open("cache.json", "r", encoding="utf-8") as f:
+            with open(CACHE_PATH, "r", encoding="utf-8") as f:
                 cache = json.load(f)
                 cache.append(modelname)
     except Exception as e:
@@ -137,7 +149,7 @@ def zapisywanie_cachu(data,modelname):
             cache = [modelname]
     
         
-    with open("cache.json", "w", encoding="utf-8") as f:
+    with open(CACHE_PATH, "w", encoding="utf-8") as f:
             json.dump(cache, f, indent=4, ensure_ascii=False)
     
 @app.post("/get-ref-via-ai")
@@ -210,9 +222,8 @@ def get_suitable_watches(user_query: str, n: int = 5):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-IMG_CACHE_FILE = "image_cache.json"
 try:
-    with open(IMG_CACHE_FILE, "r", encoding="utf-8") as f:
+    with open(IMAGE_CACHE_FILE, "r", encoding="utf-8") as f:
         image_cache = json.load(f)
 except Exception:
     image_cache = {}
@@ -230,7 +241,7 @@ def get_watch_image(user_query: str):
                 print(image_url)
                 image_cache[klucz] = image_url
                 try:
-                    with open(IMG_CACHE_FILE, "w", encoding="utf-8") as f:
+                    with open(IMAGE_CACHE_FILE, "w", encoding="utf-8") as f:
                         json.dump(image_cache, f, indent=4, ensure_ascii=False)
                 except Exception as e:
                     print(e)
