@@ -4,12 +4,14 @@ import asyncio
 from .apiconnect import get_watch_image
 from .backend import *
 
+#Scieżki do plików
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BRAND_LIST_PATH = os.path.join(BASE_DIR, "brand_list.json")
 MODEL_LIST_PATH = os.path.join(BASE_DIR, "model_list.json")
 ICON_PATH = os.path.join(BASE_DIR, "zegarekimg.png")
+
 def start():
-    ft.run(createapp,assets_dir=BASE_DIR)   
+    ft.run(createapp,name="WatchFinder",assets_dir=BASE_DIR)   
 def get_data():
     with open(MODEL_LIST_PATH,"r",encoding="utf-8") as f:
         return json.load(f)
@@ -21,7 +23,7 @@ except Exception as e:
     data = ""
     print(e)
 
-
+#Tworzenie aplikacji
 def createapp(page: ft.Page):
     get_max_cena(500)
     page.title = "WatchFinder"
@@ -33,10 +35,13 @@ def createapp(page: ft.Page):
     page.add(create_dropdown())
     page.add(create_card(page))
     create_slider(page)
-    
+
+#Wybrana Marka
 def wybrany_brand(value):
     get_marka(value)
     print(value)
+
+#wypełnianie listy marek
 def get_brands():
     lista = []
     with open(BRAND_LIST_PATH,"r",encoding="utf-8") as f:
@@ -44,6 +49,8 @@ def get_brands():
         for i in data["data"]:
             lista.append(i)
         return lista
+
+#Tworzenie wybierania  marki
 def create_dropdown():
     dropdown = ft.Dropdown(
         label="Wybierz marke",
@@ -71,6 +78,8 @@ def create_dropdown():
 #             ]),
 #         ),
 #     )
+
+#SLider do ceny
 def create_slider(page: ft.Page): 
     def handle_slider_change(e):
         get_max_cena(e.control.value)
@@ -103,7 +112,7 @@ def create_slider(page: ft.Page):
             )
         )
     )
-
+#Karta
 def create_card(page: ft.Page):
     pw = page.width or 360
     card_w = max(200, min(300, pw - 140)) 

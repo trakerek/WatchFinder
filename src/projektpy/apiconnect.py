@@ -8,21 +8,26 @@ from google import genai
 from google.genai import types
 from ddgs import DDGS
 
+
+#Sciezki do kluczów api
 base_path = os.path.dirname(os.path.abspath(__file__))
 for name in ("secrets.env", ".env"):
     p = os.path.join(base_path, name)
     if os.path.exists(p):
         load_dotenv(p)
         break
+#Podlaczenie do api
 api_key = os.getenv("apikey2")
 gemini_key = os.getenv("gptapi")
 client = genai.Client(api_key=gemini_key) if gemini_key else None
 
+#Linki do api do pobierania zegarków
 WATCH_API_URL = "https://api.thewatchapi.com/v1/brand/list"
 MODEL_API_URL = "https://api.thewatchapi.com/v1/model/list"
 DETAILS_API_URL = "https://api.thewatchapi.com/v1/model/search"
 REF_NUM_URL = "https://api.thewatchapi.com/v1/reference/list"
 
+#Sciezki do plików 
 adresy_ref = []
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_PATH = os.path.join(BASE_DIR, "model.json")
@@ -43,7 +48,11 @@ class WatchModelByAi(BaseModel):
     price: str
 class WatchImageResponse(BaseModel):
     image_url: str
+
+#Tworzenie obiektu do pobierania z api
 app =FastAPI()
+
+#Pobieranie Marek z api zegarków
 @app.get("/brands")
 def get_brands():
     
@@ -54,7 +63,7 @@ def get_brands():
     with open(BRAND_LIST_PATH,"w",encoding="utf-8") as f:
         json.dump(response.json(),f,indent=4,ensure_ascii=False)
 
-
+#Pobieranie modeli do testowania api
 @app.get("/models")
 def get_model():
     params = {
@@ -65,9 +74,7 @@ def get_model():
     with open(MODEL_LIST_PATH,"w",encoding="utf-8") as f:
         json.dump(response.json(),f,indent=4,ensure_ascii=False)
 
-
-
-
+#pobierania iformacji o zegarze z api
 def find_watch_by_ai(modelname):
     try:
             chat = client.chats.create(
@@ -85,6 +92,8 @@ def find_watch_by_ai(modelname):
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+#Pobieranie cachu
 def model_in_cache(model_name):
     try:
         with open(CACHE_PATH,"r",encoding="utf-8") as f:
@@ -97,6 +106,7 @@ def model_in_cache(model_name):
         get_details(model_name)
         print(e)
 
+#Pobieranie informacji o zegarze
 @app.get("/details")
 def get_details(modelname):
     aidata = get_watch_reference(modelname)
@@ -123,10 +133,9 @@ def get_details(modelname):
     if isinstance(data, dict):
         data["price"] = price
 
-    #pobieranie modelu
     zapisywanie_cachu(data,modelname)
-# AI API CONNECTION
 
+#Zapis do cachu
 def zapisywanie_cachu(data,modelname):
     try:
             with open(MODEL_PATH, "r", encoding="utf-8") as f:
@@ -151,7 +160,8 @@ def zapisywanie_cachu(data,modelname):
         
     with open(CACHE_PATH, "w", encoding="utf-8") as f:
             json.dump(cache, f, indent=4, ensure_ascii=False)
-    
+
+#Pobieranie numerów referencyjnych do testow
 @app.post("/get-ref-via-ai")
 def get_ref_list(brand):
     params = {
@@ -162,7 +172,7 @@ def get_ref_list(brand):
     with open("ref_nums.json","w",encoding="utf-8") as f:
         json.dump(response.json(),f,indent=4,ensure_ascii=False)
 
-
+#Wsyazywanie numerów referencyjnych przez ai
 @app.post("/get-ref-via-ai")
 def get_watch_reference(user_query: str):
     try:
@@ -184,6 +194,8 @@ def get_watch_reference(user_query: str):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+#Wybieranie odpowiednich zegarów przez ai
 @app.post("/get-suitable-watch")
 def get_suitable_watch(user_query: str):
     try:
@@ -202,7 +214,8 @@ def get_suitable_watch(user_query: str):
         return response.parsed
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-     
+
+#Pobierania 5 zegarów przez ai do płynnego działania aplikcaji
 def get_suitable_watches(user_query: str, n: int = 5):
     try:
         tekst = "Jestes ekspertem zegarmistrza i analizujesz polubione i nielubiane zegarki na podstawie podanej marki i cen. " \
@@ -228,6 +241,7 @@ try:
 except Exception:
     image_cache = {}
 
+#Pobieranie zdjęcia zegara
 @app.post("/get-watch-image")
 def get_watch_image(user_query: str):
     klucz = user_query.strip().lower()

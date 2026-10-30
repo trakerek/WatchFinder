@@ -4,6 +4,8 @@ import re
 import requests
 import threading
 from .apiconnect import get_suitable_watches, get_watch_image
+
+#klasa Zegarek pobierana z api
 class Watch:
     def __init__(self, brand, model,year_of_production ,price):
         self.brand = brand
@@ -32,6 +34,7 @@ generacja = 0          # zwiększana przy zmianie filtrów, żeby odrzucić star
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_PATH = os.path.join(BASE_DIR, "model.json")
 
+#kursy walut
 KURSY = {"PLN": 1, "EUR": 4.3, "USD": 4.0, "GBP": 5.0, "CHF": 4.5}
 
 def cena_na_liczbe(tekst):
@@ -50,6 +53,7 @@ def get_marka(inpmarka):
     print(marka)
     wypelnijtablice()
 
+#System oceny zegarkow
 def get_max_cena(wartosc):
     global max_cena
     max_cena = wartosc
@@ -63,17 +67,17 @@ def za_drogi(cena):
 def ocenione(brand, model):
     return any(w.brand == brand and w.model == model for w in liked + disliked)
 
+#Dodaje zegarki do stosu
 def wypelnijtablice(zegar : Watch = None, na_poczatek=False):
     global generacja
     with LOCK:
         if zegar != None:
-            # NOWE: zegarki z tła trafiają na początek listy (po tych już w kolejce)
             if na_poczatek:
                 stos.insert(0, zegar)
             else:
                 stos.append(zegar)
             return
-        generacja += 1  # NOWE: zmiana filtra unieważnia trwające pobieranie
+        generacja += 1
         stos.clear()
         with open(MODEL_PATH,"r",encoding="utf-8") as f:
             data = json.load(f)
@@ -109,7 +113,6 @@ def getwatch():
     if len(stos) <= PROG_DOLADOWANIA:
         doladuj_w_tle()
     if len(stos) == 0:
-        # awaryjnie: czekamy na pobieranie z tła albo pobieramy od razu
         t = pobieranie
         if t is not None and t.is_alive():
             t.join()
@@ -130,7 +133,7 @@ def like():
             w = stos.pop()
             liked.append(w)
 
-
+#Zapisywania do cachu zegarkow
 def zapisz_do_katalogu(z: Watch):
     with LOCK:
         try:
@@ -145,6 +148,7 @@ def zapisz_do_katalogu(z: Watch):
         with open("model.json", "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
 
+#Szukanie zegarka
 def znajdz_zegarek(w_tle=False):
     gen = generacja
     dodane = 0
@@ -153,14 +157,13 @@ def znajdz_zegarek(w_tle=False):
         query = (f"Marka : {marka} ulubione : {liked} niulubione : {disliked} "
                  f"maksymalna cena : {limit} ilość : {ILE_POBRAC}")
         try:
-            wyniki = get_suitable_watches(query)  # wolne wywołanie AI - poza lockiem
+            wyniki = get_suitable_watches(query)
         except Exception as e:
             print(e)
             return
         for r in wyniki or []:
             zegar = Watch(r.brand, r.model, r.year_of_production, r.price)
             with LOCK:
-                # NOWE: jeśli w międzyczasie zmieniono markę/cenę, wyrzuć stare wyniki
                 if w_tle and gen != generacja:
                     return
                 if ocenione(zegar.brand, zegar.model) or za_drogi(zegar.price):
